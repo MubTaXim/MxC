@@ -18,6 +18,7 @@ except ImportError:
     print("Error: Required modules not found. Make sure you're in the project root directory.")
     sys.exit(1)
 
+exit()
 
 class ModalSetup:
     """Handles the complete setup process for Modal × ComfyUI."""
@@ -29,6 +30,13 @@ class ModalSetup:
 
     def load_config(self):
         """Load configuration from config.ini"""
+        # Check if .env exists and create if not
+        env_file = self.project_dir / ".env"
+        if not env_file.exists():
+            print("⚠ .env file not found. Creating from template...")
+            self.setup_env_file()
+            return
+        
         try:
             loader = ConfigLoader(
                 config_path=str(self.project_dir / "config.ini"),
