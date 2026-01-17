@@ -260,13 +260,13 @@ class ModelPathsGenerator:
             return False
 
 
-def generate_extra_model_paths():
+def generate_extra_model_paths(config_file: str = "config.ini", output_file: str = "extra_model_paths.yaml"):
     """Main entry point."""
     print("\n" + "=" * 60)
     print("🔧 ComfyUI Model Paths Generator")
     print("=" * 60 + "\n")
 
-    generator = ModelPathsGenerator()
+    generator = ModelPathsGenerator(config_file=config_file, output_file=output_file)
 
     # Generate the file
     if not generator.generate():
@@ -275,7 +275,7 @@ def generate_extra_model_paths():
     # Validate the generated file
     print()
     if not generator.validate():
-        print("\n⚠ Generated file may have issues. Please review manually.")
+        print("\n⚠️ Generated file may have issues. Please review manually.")
         sys.exit(1)
 
     print("\n✅ Setup complete! You can now use extra_model_paths.yaml with ComfyUI")
