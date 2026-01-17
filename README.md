@@ -9,7 +9,7 @@
 
 **Run ComfyUI on the cloud for free with Modal's $30 monthly credits**
 
-[Features](#-features) • [Quick Start](#-quick-start) • [Installation](#-installation) • [Volume Setup](#-volume-setup-guide) • [Usage](#-usage) • [Contributing](#-contributing)
+[Features](#-features) • [Quick Start](#-quick-start) • [Installation](#-installation) • [Download Models](#-downloading-models-manually) • [Volume Setup](#-volume-setup-guide) • [Usage](#-usage) • [Contributing](#-contributing)
 
 </div>
 
@@ -59,14 +59,19 @@
 git clone https://github.com/Renks/MxC.git
 cd MxC
 
-# Create virtual environment
+# Create virtual environment (default)
 python -m venv .venv
+# OR
+uv venv     # If you have 'uv' installed
+
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
-# Install requirements
+# Install requirements (default)
 pip install -r requirements.txt
+# OR
+uv pip install -r requirements.txt
 
-# Setup authentication
+# Setup authentication (IMPORTANT!)
 modal setup  # Follow browser authentication
 
 # Configure your setup
@@ -106,7 +111,7 @@ View run at <span style="color: #ba6c66; padding:0.4rem; border: 2px solid red; 
 
 ---
 
-### 📦 Installation
+## 📦 Installation
 
 **Step 1: Clone the Repository**
 
@@ -135,17 +140,25 @@ source .venv/bin/activate
 **Step 3: Install Dependencies**
 
 ```bash
-pip install --upgrade pip
+# The default way
 pip install -r requirements.txt
+
+# Or If you're using uv
+uv pip install -r requirements.txt
+
 ```
 
-OR Manually
+OR Manually (If you fancy yourself)
 
 ```bash
-pip install modal pyyaml python-dotenv
+pip install modal==1.3.0.post1 pyyaml==6.0.3 python-dotenv==1.2.1 configparser==7.2.0
 ```
 
 **Step 4: Authenticate with Modal**
+
+**Linux and MacOS**
+
+❗Please run this before you do anything else!
 
 ```bash
 modal setup
@@ -153,9 +166,30 @@ modal setup
 
 This will open your browser to authenticate with Modal. Follow the prompts and return to the terminal.
 
+**Windows (WSL2)**
+
+🫷 For users running Windows Subsystem for Linux 2 (WSL2), the setup process requires an initial authentication step on the Windows host.
+
+1. **Run Authentication on Windows:**
+
+    Execute `modal setup` in your main Windows command prompt or PowerShell environment.
+
+2. **Locate the Configuration File:**
+
+    Successful authentication generates a `.modal.toml` file, typically saved in `%USERPROFILE%\.modal.toml`.
+
+3. **Transfer to WSL2 Environment:**
+
+    Copy this generated configuration file into your WSL2 home directory (~).
+
+    **Example transfer command:**
+    ```bash
+    cp /mnt/c/Users/<your-windows-username>/.modal.toml ~/.modal.toml
+    ```
+
 **Step 5: Configure Your Project**
 
-Edit ⚙️`config.ini` to customize your setup:
+Edit [⚙️ config.ini](./config.ini) to customize your setup:
 
 ```ini
 [RESOURCES]
@@ -177,7 +211,7 @@ python setup_modal.py
 This script will:
 
 ✅ Create your persistent volume on Modal<br/>
-✅ Download essential models from Hugging Face<br/>
+❎ Download essential models from Hugging Face (Skipped - very slow) <br/>
 ✅ Set up the folder structure<br/>
 ✅ Install custom nodes and dependencies<br/>
 ✅ Generate extra_model_paths.yaml<br/>
@@ -216,9 +250,49 @@ Open the endpoint in a web browser [https://your-modal-username--comfyui-app-com
 
 ---
 
-### 📁 Volume Setup Guide
+## 🎁 Downloading Models (Manually)
 
-Default volume name is `my-comfy-models` but you can change it in ⚙️`config.ini` file
+The required directory structure is automatically generated upon the successful execution of `python setup_modal.py`. Make sure you ran `setup_modal.py` without any errors.
+
+1. **Access the Volume Shell**
+
+    Open an interactive shell session within your Modal volume:
+
+    ```bash
+    modal shell --volume <your-volume-name>
+    ```
+    _Note: Your volume will be mounted at `/mnt/<your-volume-name>`_.
+
+2. **Navigate to the Target Directory**
+
+    Change to the appropriate directory based on the model type:
+
+    ```bash
+    # For diffusion models:
+    cd /mnt/<your-volume-name>/diffusion_models/
+
+    # For checkpoints:
+    cd /mnt/<your-volume-name>/checkpoints/
+    ```
+
+3. **Download Models via CLI**
+
+    Identify your desired model on [Hugging Face](https://huggingface.co). We will use [unsloth/Z-Image-Turbo-GGUF](https://huggingface.co/unsloth/Z-Image-Turbo-GGUF/blob/main/z-image-turbo-Q8_0.gguf) as an example. Copy the direct download link for the file and use the `wget` utility to download it directly into the volume.
+
+    **Example**
+    ```bash
+    wget https://huggingface.co/unsloth/Z-Image-Turbo-GGUF/resolve/main/z-image-turbo-Q8_0.gguf
+    ```
+
+    This command downloads `z-image-turbo-Q8_0.gguf` file directly into your _current working directory_ within the Modal volume.
+    <br />
+    Repeat for more models. You can also use `wget` utility to download `loras` and other files in their appropriate folders.
+
+---
+
+## 📁 Volume Setup Guide
+
+Default volume name is `my-comfy-models` but you can change it in [⚙️ config.ini](./config.ini) file
 
 ```ini
 [FILESYSTEM]
@@ -229,43 +303,44 @@ volume_name = my-fancy-volume-name-goes-here
 Your Modal persistent volume should be organized like this:
 
 ```bash
-📁 my-comfy-models-id-provided-by-modal-dot-com/ # don't worry this name will be different
-├─ 📁 checkpoints/          # manually download models here
+📁 id-provided-by-modal-dot-com/    # this name will be different
+├─ 📁 checkpoints/                  # manually download models here
 │  ├─ 📄 model.safetensors
 │  └─ 📄 flux-dev.safetensors
-├─ 📁 custom_nodes/         # add comfyui's custom_nodes here
+├─ 📁 custom_nodes/                 # add comfyui's custom_nodes here
 │  ├─ 📁 ComfyUI-GGUF
 │  ├─ 📁 rgthree-comfy
 │  ├─ 📁 seedvr2_videoupscaler
 │  └─ 📁 comfyui-controlnet-aux
-├─ 📁 diffusion_models/
+├─ 📁 diffusion_models/             # manually download models here
+│  ├─ 📄 z-image-turbo-Q8_0.gguf
 │  ├─ 📄 qwen-image-edit-2511-Q4_1.gguf
 │  ├─ 📄 seedvr2_ema_7b_fp16.safetensors
 │  └─ 📄 seedvr2_ema_7b_sharp_fp16.safetensors
-├─ 📁 loras/
+├─ 📁 loras/                        # manually download loras here
 │  ├─ 📄 Qwen-Image-Edit-Lightning.safetensors
 │  └─ 📄 flux-canny-controlnet-alpha.safetensors
-├─ 📁 text_encoders/
+├─ 📁 text_encoders/                # manually download clip models here
 │  └─ 📄 qwen_2.5_vl_7b_fp8_scaled.safetensors
 ├─ 📁 unet/
 │  └─ 📄 diffusion_pytorch_model.safetensors
-└─ 📁 vae/
+└─ 📁 vae/                          # manually download vae(s) here
    ├─ 📄 ema_vae_fp16.safetensors
    └─ 📄 qwen_image_vae.safetensors
 ```
 
 **Downloading Models**
 
-The `setup_modal.py` script handles this automatically. You can also manually add models:
+~~The `setup_modal.py` script handles this automatically~~ (It was very slow and tedious). You can also manually add models:
 
 Make sure you drop into your modal volume's shell first `modal shell --volume <your-volume-name>`
 Once in, cd to volume using `cd /mnt/<your-volume-name>`
 
 1. **From Hugging Face:**
 
-```bash
-huggingface-cli download model-id --local-dir ./checkpoints
-```
+    ```bash
+    huggingface-cli download model-id --local-dir ./checkpoints
+    ```
 
 2. **From CivitAI:**
 
@@ -274,13 +349,16 @@ huggingface-cli download model-id --local-dir ./checkpoints
 
 3. **Using Modal CLI:**
 
-```bash
-modal volume put <your-volume-name> path/to/local/model/checkpoints/model.safetensors
-```
+    ```bash
+    modal volume put <your-volume-name> path/to/local/model/checkpoints/model.safetensors
+    ```
+4. **Using Wget CLI:**
+    
+    Instructions [here](#-downloading-models-manually).
 
 ---
 
-### 🎮 Usage
+## 🎮 Usage
 
 **Running ComfyUI**
 
@@ -294,15 +372,28 @@ modal serve main.py
 
 **Interactive Shell Access (Debugging)**
 
-Browse and debug the container filesystem:
+To inspect the runtime environment or debug the filesystem, you can access the container using the following methods:
 
-```bash
-# Linux/macOS
-./browsefs.sh
+1. **Active Instance Attachment (Recommended)**
+    
+    While [⚡main.py](./main.py) is executing, run the following command in a separate terminal tab to attach an interactive shell to the running container:
+    
+    ```bash
+    modal shell main.py     # in a new terminal tab ofcourse
+    ```
+    This allows you to manage the filesystem in real-time and install additional packages as needed within the active Modal volume.
 
-# Windows (PowerShell)
-.\browsefs.ps1
-```
+2. **Legacy File Browsing (Deprecated)**
+
+    Browse and debug the container filesystem:
+
+    ```bash
+    # Linux/macOS
+    ./browsefs.sh
+
+    # Windows (PowerShell)
+    .\browsefs.ps1
+    ```
 
 **Managing Models and Custom Nodes**
 
@@ -329,9 +420,9 @@ modal app list
 
 ---
 
-### ⚙️ Configuration
+## ⚙️ Configuration
 
-Edit ⚙️`config.ini` to customize your deployment:
+Edit [⚙️ config.ini](./config.ini) to customize your deployment:
 
 ```ini
 [TOKENS]
@@ -363,10 +454,12 @@ loras =
     models/loras/
     /root/per_comfy-storage/loras
 ```
+**🚧 Documentation in Progress**<br />
+More instructions will be added later. Please refer to the inline comments within [⚙️ config.ini](./config.ini) for detailed parameter descriptions and setup instructions.
 
 ---
 
-### 🔐 Security
+## 🔐 Security
 
 - **API Keys**: Store tokens in a .env file (never commit to git)
 - **Volume Access**: Only accessible within Modal containers
@@ -384,7 +477,7 @@ CIVITAI_API_TOKEN=your_civitai_token
 
 ---
 
-### 📊 Cost Breakdown
+## 📊 Cost Breakdown
 
 | Resource          |  Cost  | Modal Credits |
 | ----------------- | :----: | :-----------: |
@@ -397,14 +490,14 @@ CIVITAI_API_TOKEN=your_civitai_token
 
 ---
 
-### 🛠️ Troubleshooting
+## 🛠️ Troubleshooting
 
 **Virtual Environment Not Activating**
 
 ```bash
 # Recreate the venv
 rm -rf .venv
-python3.11 -m venv .venv
+python3.11 -m venv .venv    # OR 'uv venv'
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
@@ -413,7 +506,7 @@ pip install -r requirements.txt
 
 ```bash
 rm ~/.modal.toml    # Windows (CMD): del "%USERPROFILE%\.modal.toml"
-modal setup  # Re-authenticate
+modal setup         # Re-authenticate
 ```
 
 **Volume Not Found**
@@ -426,7 +519,19 @@ modal volume list
 modal volume create my-comfy-models
 ```
 
+**Check the running container(s)**
+
+```bash
+# List all running containers with their ID
+modal container list
+
+# Attach shell to a specific container 
+modal shell <Container ID>
+
+```
+
 **Models Not Loading**
+
 Check the volume structure:
 
 ```bash
@@ -437,27 +542,33 @@ modal volume ls my-comfy-models checkpoints/
 
 ---
 
-### 📚 Project Structure
+## 📚 Project Structure
 
-```ts
-modal-comfyui/
-├── main.py                     # Main Modal app
-├── setup_modal.py              # Setup and initialization script
-├── generate_model_paths.py     # YAML config generator
-├── config.ini                  # Configuration file
-├── extra_model_paths.yaml      # Generated model paths
-├── .env.example                # Environment variables template
-├── requirements.txt            # Python dependencies
-├── browsefs.sh                 # Container shell access (Linux)
-├── browsefs.ps1                # Container shell access (Windows)
-├── README.md                   # This file
-└── workflows/                  # ComfyUI workflow templates
-    └── example_workflow.json
+```bash
+📁 MxC/
+├─📁 workflows/                 # ComfyUI workflow templates (will be uploaded)
+│ └─📄 README.md                # README for workflows (auto-generated)
+│ └─📄 example_workflow.json    # Dummy workflow (doesn't exist)
+├─📄 README.md                  # This file
+├─📄 setup_modal.py             # Setup and initialization script
+├─📄 main.py                    # Main Modal app
+├─📄 loaders.py                 # Python library to load and parse config.ini file
+├─📄 generate_model_paths.py    # YAML config generator
+├─📄 config.ini                 # Configuration file for the project (Important)
+├─📄 requirements.txt           # Python dependencies
+├─📄 extra_model_paths.yaml     # ComfyUI's extra paths (will be uploaded to container)
+├─📄 comfy.settings.json        # Settings for ComfyUI (will be uploaded to container)
+├─📄 config_comfyui.ini         # Settings for ComfyUI's Manager (will also be uploaded)
+├─📄 .env.BAK                   # Environment variables template
+├─📄 .env                       # Environment variables (Store your tokens here)
+├─📄 .emptyfile                 # Used for creating directories inside Modal volume
+├─📄 pyproject.toml             # Project file (ignore)
+└─📄 uv.lock                    # Project file (ignore)
 ```
 
 ---
 
-### 🤝 Contributing
+## 🤝 Contributing
 
 We welcome contributions! Please:
 
@@ -469,13 +580,13 @@ We welcome contributions! Please:
 
 ---
 
-### 📝 License
+## 📝 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
 ---
 
-### 🙏 Acknowledgments
+## 🙏 Acknowledgments
 
 - [Modal.com](https://modal.com) - For incredible free cloud compute credits
 - [ComfyUI](https://www.comfy.org) - For the amazing node-based UI
@@ -483,7 +594,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-### 📞 Support
+## 📞 Support
 
 - 📖 [Modal Documentation](https://modal.com/docs/guide)
 - 🐛 [ComfyUI Issues](https://github.com/Comfy-Org/ComfyUI)
