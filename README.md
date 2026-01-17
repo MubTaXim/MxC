@@ -52,7 +52,7 @@
 - Git
 - Modal account ([sign up free](https://modal.com))
 
-### 30-Second Setup
+### ⚡ 30-Second Setup
 
 ```bash
 # Clone the repository
@@ -77,22 +77,30 @@ modal serve main.py
 ```
 
 You will be given a public URL by the modal api, like so:
-```bash
-⋮
+<div>
+<sup>This output is for illustration purposes only.</sup>
+<pre>
+ ⋮
 🔨 Created web endpoint for ComfyUIContainer.ui =>
-    https://<your-modal-username>--comfyui-app-comfyuicontainer-ui-dev.modal.run
-⋮
-```
-Open the endpoint in a web browser [https://your-modal-username--comfyui-app-comfyuicontainer-ui-dev.modal.run](https://your-modal-username--comfyui-app-comfyuicontainer-ui-dev.modal.run)
+    <span style="color: #ba6c66; padding:0.4rem; border: 2px solid red; font-weight: bold; cursor: pointer;">https://abc--appname-container-dev.modal.run</span>
+ ⋮
+</pre>
+</div>
+
+Open the endpoint in a web browser to use ComfyUI! 👏
 
 While the following URL will be used for monitor your app:
-```bash
-⋮
-✓ Initialized. View run at https://modal.com/apps/<your-modal-username>/main/<app-id>
+<div>
+<sup>This output is for illustration purposes only.</sup>
+<pre>
+ ⋮
+✓ Initialized.
+View run at <span style="color: #ba6c66; padding:0.4rem; border: 2px solid red; font-weight: bold; cursor: pointer;">https://modal.com/apps/your-modal-username/main/app-id</span>
 ✓ Created objects.
 ├── 🔨 Created mount /path/to/main.py
-⋮
-```
+ ⋮
+</pre>
+</div>
 
 ---
 
