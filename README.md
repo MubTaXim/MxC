@@ -60,8 +60,8 @@ git clone https://github.com/Renks/MxC.git
 cd MxC
 
 # Create virtual environment
-python -m venv venv
-source .venv/bin/activate  # On Windows: venv\Scripts\activate
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
 # Install requirements
 pip install -r requirements.txt
@@ -119,16 +119,16 @@ cd MxC
 
 ```bash
 # Create virtual environment
-python -m venv venv
+python -m venv .venv
 
 # Activate virtual environment
 source .venv/bin/activate
 
 # On Windows (PowerShell)
-# .\venv\Scripts\Activate.ps1
+# .\.venv\Scripts\Activate.ps1
 
 # On Windows (CMD)
-# venv\Scripts\activate.bat
+# .venv\Scripts\activate.bat
 
 ```
 
@@ -403,8 +403,8 @@ CIVITAI_API_TOKEN=your_civitai_token
 
 ```bash
 # Recreate the venv
-rm -rf venv
-python3.11 -m venv venv
+rm -rf .venv
+python3.11 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
