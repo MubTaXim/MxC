@@ -1,2 +1,3 @@
 python-dotenv==1.2.1
 modal==1.3.0.post1
+pyyaml==6.0.3

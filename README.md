@@ -77,6 +77,7 @@ modal serve main.py
 ```
 
 You will be given a public URL by the modal api, like so:
+
 <div>
 <sup>This output is for illustration purposes only.</sup>
 <pre>
@@ -90,6 +91,7 @@ You will be given a public URL by the modal api, like so:
 Open the endpoint in a web browser to use ComfyUI! 👏
 
 While the following URL will be used for monitor your app:
+
 <div>
 <sup>This output is for illustration purposes only.</sup>
 <pre>
@@ -136,7 +138,9 @@ source .venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
+
 OR Manually
+
 ```bash
 pip install modal pyyaml python-dotenv
 ```
@@ -150,6 +154,7 @@ modal setup
 This will open your browser to authenticate with Modal. Follow the prompts and return to the terminal.
 
 **Step 5: Configure Your Project**
+
 Edit ⚙️`config.ini` to customize your setup:
 
 ```ini
@@ -212,12 +217,15 @@ Open the endpoint in a web browser [https://your-modal-username--comfyui-app-com
 ---
 
 ### 📁 Volume Setup Guide
+
 Default volume name is `my-comfy-models` but you can change it in ⚙️`config.ini` file
+
 ```ini
 [FILESYSTEM]
 ; Name of the volume to be created for persistent storage. Diffusion models and custom nodes will be stored here
 volume_name = my-fancy-volume-name-goes-here
 ```
+
 Your Modal persistent volume should be organized like this:
 
 ```bash
@@ -378,27 +386,29 @@ CIVITAI_API_TOKEN=your_civitai_token
 
 ### 📊 Cost Breakdown
 
-| Resource            |   Cost   | Modal Credits |
-| ------------------- | :------: | :-----------: |
-| A10G GPU (1 hour)   |  ~$1.50  | 0.05 credits  |
-| T4 GPU (1 hour)     |  ~$0.35  | 0.01 credits  |
-| Storage (1GB/month) |   Free   |     Free      |
-| Monthly Budget      | ~$45 $30 |     free      |
+| Resource          |  Cost  | Modal Credits |
+| ----------------- | :----: | :-----------: |
+| A10G GPU (1 hour) | ~$1.50 | 0.05 credits  |
+| T4 GPU (1 hour)   | ~$0.35 | 0.01 credits  |
+| Storage           |  Free  |     Free      |
+| Monthly Budget    |  ~$45  |      $30      |
 
 **You get $30 credits per month** = **free unlimited usage!**
 
 ---
 
 ### 🛠️ Troubleshooting
+
 **Virtual Environment Not Activating**
 
 ```bash
 # Recreate the venv
 rm -rf venv
 python3.11 -m venv venv
-source venv/bin/activate
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
+
 **Modal Authentication Failed**
 
 ```bash
@@ -407,6 +417,7 @@ modal setup  # Re-authenticate
 ```
 
 **Volume Not Found**
+
 ```bash
 # List all volumes
 modal volume list
@@ -414,33 +425,42 @@ modal volume list
 # Create volume if missing
 modal volume create my-comfy-models
 ```
+
 **Models Not Loading**
 Check the volume structure:
+
 ```bash
+modal volume ls my-comfy-models diffusion_models/
+#   OR
 modal volume ls my-comfy-models checkpoints/
 ```
+
 ---
 
 ### 📚 Project Structure
+
 ```ts
 modal-comfyui/
-├── main.py          # Main Modal app
-├── setup_modal.py           # Setup and initialization script
-├── generate_model_paths.py  # YAML config generator
-├── config.ini               # Configuration file
-├── extra_model_paths.yaml   # Generated model paths
-├── .env.example             # Environment variables template
-├── requirements.txt         # Python dependencies
-├── browsefs.sh             # Container shell access (Linux)
-├── browsefs.ps1            # Container shell access (Windows)
-├── README.md               # This file
-└── workflows/              # ComfyUI workflow templates
+├── main.py                     # Main Modal app
+├── setup_modal.py              # Setup and initialization script
+├── generate_model_paths.py     # YAML config generator
+├── config.ini                  # Configuration file
+├── extra_model_paths.yaml      # Generated model paths
+├── .env.example                # Environment variables template
+├── requirements.txt            # Python dependencies
+├── browsefs.sh                 # Container shell access (Linux)
+├── browsefs.ps1                # Container shell access (Windows)
+├── README.md                   # This file
+└── workflows/                  # ComfyUI workflow templates
     └── example_workflow.json
 ```
+
 ---
 
 ### 🤝 Contributing
+
 We welcome contributions! Please:
+
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
@@ -450,11 +470,13 @@ We welcome contributions! Please:
 ---
 
 ### 📝 License
+
 This project is licensed under the MIT License - see the LICENSE file for details.
 
 ---
 
 ### 🙏 Acknowledgments
+
 - [Modal.com](https://modal.com) - For incredible free cloud compute credits
 - [ComfyUI](https://www.comfy.org) - For the amazing node-based UI
 - [Hugging Face](https://huggingface.co) - For model hosting and APIs
@@ -462,9 +484,11 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ---
 
 ### 📞 Support
+
 - 📖 [Modal Documentation](https://modal.com/docs/guide)
 - 🐛 [ComfyUI Issues](https://github.com/Comfy-Org/ComfyUI)
 - 💬 [Modal Community](modal.com/slack)
+
 ---
 
 <div align="center">
