@@ -172,7 +172,13 @@ class ModalSetup:
         print("\n" + "=" * 60)
         print("🤖 DOWNLOADING MODELS (OPTIONAL)")
         print("=" * 60)
-
+        print("Model downloading is disabled by default to save setup time.")
+        print(f"Drop into your Modal volume's shell using:")
+        print(f"    modal shell --volume {self.config['filesystem']['volume_name']}")
+        print(f"and then use \"wget\" utility to download models manually.")
+        print(f"Alternatively, you can use the 'modal volume put' command to upload models from your local machine to the volume.")
+        print(f"Do not forget to run \"sync\" command inside volume's shell after downloading models to ensure they are properly saved in the volume.")
+        return
         print("Model downloading from Hugging Face can be time-consuming.")
         response = input("Do you want to download essential models now? (y/n): ").strip().lower()
 
@@ -301,11 +307,18 @@ CIVITAI_API_TOKEN = "your_civitai_token_here"
         print("   Place .safetensors, .ckpt, or .gguf files in appropriate folders")
         print("   Upload to Modal volume using:")
         print(f"   modal volume put {self.config['filesystem']['volume_name']} <local-path> <remote-path>")
+        print(f"   OR   ")
+        print(f"Drop into volume shell:")
+        print(f"   modal shell --volume {self.config['filesystem']['volume_name']}")
+        print(f"cd to /mnt/{self.config['filesystem']['volume_name']}/diffusion_models/ (or other folders)")
+        print("   Use wget or curl to download models directly into the volume")
+        print("   Don't forget to run 'sync' command inside the shell after downloading")
 
         print("\n5. Start ComfyUI:")
         print("   modal serve main.py")
 
         print("\n📚 Documentation:")
+        print("   - 🚀 Modal × ComfyUI: https://github.com/Renks/MxC")
         print("   - Modal: https://modal.com/docs")
         print("   - ComfyUI: https://github.com/Comfy-Org/ComfyUI")
         print("   - ComfyUI Registry: https://registry.comfy.org")

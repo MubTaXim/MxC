@@ -412,7 +412,7 @@ pip install -r requirements.txt
 **Modal Authentication Failed**
 
 ```bash
-modal logout
+rm ~/.modal.toml    # Windows (CMD): del "%USERPROFILE%\.modal.toml"
 modal setup  # Re-authenticate
 ```
 
