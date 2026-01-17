@@ -239,10 +239,12 @@ Your Modal persistent volume should be organized like this:
 ```
 
 **Downloading Models**
+
 The `setup_modal.py` script handles this automatically. You can also manually add models:
 
 Make sure you drop into your modal volume's shell first `modal shell --volume <your-volume-name>`
 Once in, cd to volume using `cd /mnt/<your-volume-name>`
+
 1. **From Hugging Face:**
 
 ```bash
@@ -275,6 +277,7 @@ modal serve main.py
 ```
 
 **Interactive Shell Access (Debugging)**
+
 Browse and debug the container filesystem:
 
 ```bash
@@ -457,7 +460,8 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ---
 
 <div align="center">
-⬆ back to top
+
+[⬆ back to top](#-modal--comfyui)
 
 Made with ❤️ for the AI community
 
