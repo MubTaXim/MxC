@@ -260,7 +260,7 @@ class ModelPathsGenerator:
             return False
 
 
-def main():
+def generate_extra_model_paths():
     """Main entry point."""
     print("\n" + "=" * 60)
     print("🔧 ComfyUI Model Paths Generator")
@@ -282,4 +282,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    generate_extra_model_paths()
