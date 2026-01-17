@@ -1,0 +1,9 @@
+[project]
+name = "comfyuimodal"
+version = "0.1.0"
+description = "Comfyui deployment on Modal.com with persistent storage and GPU support."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "python-dotenv>=1.2.1",
+]
