@@ -184,6 +184,7 @@ class ModalSetup:
         print(f"and then use \"wget\" utility to download models manually.")
         print(f"Alternatively, you can use the 'modal volume put' command to upload models from your local machine to the volume.")
         print(f"Do not forget to run \"sync\" command inside volume's shell after downloading models to ensure they are properly saved in the volume.")
+        input("Press Enter to continue...")
         return
         print("Model downloading from Hugging Face can be time-consuming.")
         response = input("Do you want to download essential models now? (y/n): ").strip().lower()
