@@ -9,7 +9,7 @@
 
 **Run ComfyUI on the cloud for free with Modal's $30 monthly credits**
 
-[Features](#-features) • [Quick Start](#-quick-start) • [Installation](#-installation) • [Download Models](#-downloading-models-manually) • [Volume Setup](#-volume-setup-guide) • [Usage](#-usage) • [Contributing](#-contributing)
+[Features](#-features) • [Quick Start](#-quick-start) • [Installation](#-installation) • [Volume Setup](#-volume-setup-guide) • [Download Models](#-downloading-models-manually) • [Usage](#-usage) • [Contributing](#-contributing)
 
 </div>
 
@@ -49,6 +49,7 @@
 
 - Linux, macOS, or Windows (with WSL2)
 - Python 3.11+
+- uv ([link](https://docs.astral.sh/uv/getting-started/installation))
 - Git
 - Modal account ([sign up free](https://modal.com))
 
@@ -59,16 +60,11 @@
 git clone https://github.com/Renks/MxC.git
 cd MxC
 
-# Create virtual environment (default)
-python -m venv .venv
-# OR
-uv venv     # If you have 'uv' installed
+# Create and activate virtual environment
+uv venv
+source .venv/bin/activate
 
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-
-# Install requirements (default)
-pip install -r requirements.txt
-# OR
+# Install requirements
 uv pip install -r requirements.txt
 
 # Setup authentication (IMPORTANT!)
@@ -124,7 +120,7 @@ cd MxC
 
 ```bash
 # Create virtual environment
-python -m venv .venv
+uv venv
 
 # Activate virtual environment
 source .venv/bin/activate
@@ -140,12 +136,7 @@ source .venv/bin/activate
 **Step 3: Install Dependencies**
 
 ```bash
-# The default way
-pip install -r requirements.txt
-
-# Or If you're using uv
 uv pip install -r requirements.txt
-
 ```
 
 OR Manually (If you fancy yourself)
@@ -250,46 +241,6 @@ Open the endpoint in a web browser [https://your-modal-username--comfyui-app-com
 
 ---
 
-## 🎁 Downloading Models (Manually)
-
-The required directory structure is automatically generated upon the successful execution of `python setup_modal.py`. Make sure you ran `setup_modal.py` without any errors.
-
-1. **Access the Volume Shell**
-
-    Open an interactive shell session within your Modal volume:
-
-    ```bash
-    modal shell --volume <your-volume-name>
-    ```
-    _Note: Your volume will be mounted at `/mnt/<your-volume-name>`_.
-
-2. **Navigate to the Target Directory**
-
-    Change to the appropriate directory based on the model type:
-
-    ```bash
-    # For diffusion models:
-    cd /mnt/<your-volume-name>/diffusion_models/
-
-    # For checkpoints:
-    cd /mnt/<your-volume-name>/checkpoints/
-    ```
-
-3. **Download Models via CLI**
-
-    Identify your desired model on [Hugging Face](https://huggingface.co). We will use [unsloth/Z-Image-Turbo-GGUF](https://huggingface.co/unsloth/Z-Image-Turbo-GGUF/blob/main/z-image-turbo-Q8_0.gguf) as an example. Copy the direct download link for the file and use the `wget` utility to download it directly into the volume.
-
-    **Example**
-    ```bash
-    wget https://huggingface.co/unsloth/Z-Image-Turbo-GGUF/resolve/main/z-image-turbo-Q8_0.gguf
-    ```
-
-    This command downloads `z-image-turbo-Q8_0.gguf` file directly into your _current working directory_ within the Modal volume.
-    <br />
-    Repeat for more models. You can also use `wget` utility to download `loras` and other files in their appropriate folders.
-
----
-
 ## 📁 Volume Setup Guide
 
 Default volume name is `my-comfy-models` but you can change it in [⚙️ config.ini](./config.ini) file
@@ -355,6 +306,47 @@ Once in, cd to volume using `cd /mnt/<your-volume-name>`
 4. **Using Wget CLI:**
     
     Instructions [here](#-downloading-models-manually).
+
+---
+
+
+## 🎁 Downloading Models (Manually)
+
+The required directory structure is automatically generated upon the successful execution of `python setup_modal.py`. Make sure you ran `setup_modal.py` without any errors.
+
+1. **Access the Volume Shell**
+
+    Open an interactive shell session within your Modal volume:
+
+    ```bash
+    modal shell --volume <your-volume-name>
+    ```
+    _Note: Your volume will be mounted at `/mnt/<your-volume-name>`_.
+
+2. **Navigate to the Target Directory**
+
+    Change to the appropriate directory based on the model type:
+
+    ```bash
+    # For diffusion models:
+    cd /mnt/<your-volume-name>/diffusion_models/
+
+    # For checkpoints:
+    cd /mnt/<your-volume-name>/checkpoints/
+    ```
+
+3. **Download Models via CLI**
+
+    Identify your desired model on [Hugging Face](https://huggingface.co). We will use [unsloth/Z-Image-Turbo-GGUF](https://huggingface.co/unsloth/Z-Image-Turbo-GGUF/blob/main/z-image-turbo-Q8_0.gguf) as an example. Copy the direct download link for the file and use the `wget` utility to download it directly into the volume.
+
+    **Example**
+    ```bash
+    wget https://huggingface.co/unsloth/Z-Image-Turbo-GGUF/resolve/main/z-image-turbo-Q8_0.gguf
+    ```
+
+    This command downloads `z-image-turbo-Q8_0.gguf` file directly into your _current working directory_ within the Modal volume.
+    <br />
+    Repeat for more models. You can also use `wget` utility to download `loras` and other files in their appropriate folders.
 
 ---
 
@@ -497,9 +489,9 @@ CIVITAI_API_TOKEN=your_civitai_token
 ```bash
 # Recreate the venv
 rm -rf .venv
-python3.11 -m venv .venv    # OR 'uv venv'
+uv venv    # OR 'python3.11 -m venv .venv'
 source .venv/bin/activate
-pip install -r requirements.txt
+uv pip install -r requirements.txt
 ```
 
 **Modal Authentication Failed**
