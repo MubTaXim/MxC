@@ -95,6 +95,7 @@ comfy_image = (
         "comfy node install ComfyUI-segment-anything-2", # SAM2 segmentation
         "comfy node install ComfyUI-Florence2",         # Florence2 for auto-captioning
         "comfy node install ComfyUI-KJNodes",           # Additional utilities
+        "comfy node install rgthree-comfy",             # UI nodes (Image Comparer, Labels, etc.)
     )
     # Add loaders.py file for configuration loading inside the container
     .add_local_python_source("loaders", copy=False)
