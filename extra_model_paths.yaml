@@ -34,6 +34,13 @@ comfyui:
     model_patches: | 
           models/model_patches/
           /root/per_comfy-storage/model_patches/
+    # Segmentation models (RMBG, SAM2)
+    rmbg: |
+          models/rmbg/
+          /root/per_comfy-storage/rmbg/
+    sam2: |
+          models/sam2/
+          /root/per_comfy-storage/sam2/
     custom_nodes: /root/per_comfy-storage/custom_nodes
 
 

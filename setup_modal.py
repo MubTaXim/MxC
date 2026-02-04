@@ -152,7 +152,11 @@ class ModalSetup:
             "vae",
             "model_patches",
             "custom_nodes",
-            "output"
+            "output",
+            # FLUX Klein + LanPaint specific
+            "rmbg",      # RMBG segmentation models
+            "sam2",      # SAM2 segmentation models
+            "clip",      # CLIP models for FLUX
         ]
 
         print(f"Creating folder structure in '{volume_name}'... will take a moment.")

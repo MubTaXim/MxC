@@ -70,11 +70,15 @@ comfy_image = (
         "git", "nano",
         "libgl1", "libglib2.0-0", "libsm6", "libxext6", "libxrender1"  # OpenCV dependencies
     )
-    .pip_install("comfy-cli", "gguf", "sentencepiece", "opencv-python-headless")
+    .pip_install(
+        "comfy-cli", "gguf", "sentencepiece", "opencv-python-headless",
+        "transformers", "accelerate", "safetensors",  # For FLUX models
+        "timm", "einops",  # For SAM2/Florence2
+    )
     .run_commands("comfy --skip-prompt install --nvidia")
     .run_commands(
-        # Some Useful Custom Nodes (Optional)
-        "comfy node install ComfyUI-Crystools",  # For Resource monitor
+        # Core Custom Nodes
+        "comfy node install ComfyUI-Crystools",  # Resource monitor
         "comfy node install comfyui-easy-use",
         "comfy node install comfyui-kjnodes",
         "comfy node install comfyui_ultimatesdupscale",
@@ -82,6 +86,15 @@ comfy_image = (
         "comfy node install comfyui-detail-daemon",
         "comfy node install seedvarianceenhancer",
         "comfy node install comfyui_controlnet_aux",
+    )
+    .run_commands(
+        # FLUX.2 Klein + LanPaint Inpainting Stack
+        "comfy node install ComfyUI-GGUF",              # GGUF model support for Klein
+        "comfy node install ComfyUI-LanPaint",          # LanPaint inpainting (TMLR peer-reviewed)
+        "comfy node install ComfyUI-BRIA_AI-RMBG",      # RMBG 2.0 background removal
+        "comfy node install ComfyUI-segment-anything-2", # SAM2 segmentation
+        "comfy node install ComfyUI-Florence2",         # Florence2 for auto-captioning
+        "comfy node install ComfyUI-KJNodes",           # Additional utilities
     )
     # Add loaders.py file for configuration loading inside the container
     .add_local_python_source("loaders", copy=False)
