@@ -180,8 +180,8 @@ class ComfyUIContainer:
         nodes_path = Path(CUSTOM_NODES_DIR)
 
         if not nodes_path.exists():
-            print("No custom_nodes directory found; skipping dependency check.")
-            return
+            print(f"Creating missing custom_nodes directory: {nodes_path}")
+            nodes_path.mkdir(parents=True, exist_ok=True)
 
         print("--- Checking for custom node requirements ---")
         for node_dir in nodes_path.iterdir():
