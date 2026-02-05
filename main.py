@@ -74,6 +74,7 @@ comfy_image = (
         "comfy-cli", "gguf", "sentencepiece", "opencv-python-headless",
         "transformers", "accelerate", "safetensors",  # For FLUX models
         "timm", "einops",  # For SAM2/Florence2
+        "huggingface-hub",  # For model downloads
     )
     .run_commands("comfy --skip-prompt install --nvidia")
     .run_commands(
@@ -96,6 +97,7 @@ comfy_image = (
         "comfy node install ComfyUI-Florence2",         # Florence2 for auto-captioning
         "comfy node install ComfyUI-KJNodes",           # Additional utilities
         "comfy node install rgthree-comfy",             # UI nodes (Image Comparer, Labels, etc.)
+        "comfy node install comfyui-image-compare",     # ImageCompareNode for inpainting workflow
     )
     # Add loaders.py file for configuration loading inside the container
     .add_local_python_source("loaders", copy=False)
@@ -106,7 +108,8 @@ comfy_image = (
     .add_local_file(str(CURRENT_DIR / "extra_model_paths.yaml"), remote_path=str(COMFYUI_DIR + "/extra_model_paths.yaml"))
     .add_local_file(str(CURRENT_DIR / "config_comfyui.ini"), remote_path=str(COMFYUI_DIR + "/user/__manager/config.ini"))
     .add_local_file(str(CURRENT_DIR / "comfy.settings.json"), remote_path=str(COMFYUI_DIR + "/user/default/comfy.settings.json"))
-    .add_local_dir(str(CURRENT_DIR / "workflows/"), remote_path=str(COMFYUI_DIR + "/user/default/workflows/"))
+    # Copy local workflows to a temp location in image (will be moved to volume at startup)
+    .add_local_dir(str(CURRENT_DIR / "workflows/"), remote_path="/tmp/workflows_template/")
 )
 
 # ===========================
@@ -143,8 +146,37 @@ class ComfyUIContainer:
     def setup_dependencies(self):
         """
         Scans the persistent custom_nodes directory for requirements.txt files
-        and installs the dependencies.
+        and installs the dependencies. Also sets up writable workflows directory.
         """
+        import shutil
+        
+        # Setup writable workflows directory in volume
+        workflows_template = Path("/tmp/workflows_template")
+        workflows_dst = Path(VOLUME_MOUNT_LOCATION) / "workflows"
+        comfy_workflows_link = Path(COMFYUI_DIR) / "user/default/workflows"
+        
+        # Create workflows directory in volume if it doesn't exist
+        workflows_dst.mkdir(parents=True, exist_ok=True)
+        
+        # Copy template workflows to volume (only if they don't already exist)
+        if workflows_template.exists():
+            print(f"--- Syncing template workflows to volume ---")
+            for workflow_file in workflows_template.glob("*.json"):
+                dest_file = workflows_dst / workflow_file.name
+                if not dest_file.exists():
+                    shutil.copy2(workflow_file, dest_file)
+                    print(f"  Copied: {workflow_file.name}")
+        
+        # Create symlink from ComfyUI to volume workflows (writable location)
+        comfy_workflows_link.parent.mkdir(parents=True, exist_ok=True)
+        if comfy_workflows_link.exists() and comfy_workflows_link.is_symlink():
+            comfy_workflows_link.unlink()
+        elif comfy_workflows_link.exists():
+            shutil.rmtree(comfy_workflows_link)
+        comfy_workflows_link.symlink_to(workflows_dst)
+        print(f"✅ Workflows directory linked: {comfy_workflows_link} -> {workflows_dst}")
+        
+        # Install custom node dependencies
         nodes_path = Path(CUSTOM_NODES_DIR)
 
         if not nodes_path.exists():
@@ -161,6 +193,36 @@ class ComfyUIContainer:
                     subprocess.run(
                         ["pip", "install", "-r", str(req_file)], check=False)
         print("--- Dependency check complete ---")
+
+    @modal.method()
+    def download_model(self, repo_id: str, local_dir: str, patterns: list = None):
+        """
+        Download a model from HuggingFace to the persistent volume.
+        
+        Args:
+            repo_id: HuggingFace repo ID (e.g., "black-forest-labs/FLUX.2-klein-9B")
+            local_dir: Directory inside volume to save to (e.g., "/root/per_comfy-storage/diffusion_models/FLUX.2-klein-9B")
+            patterns: Optional list of file patterns to download (e.g., ["*.safetensors"])
+        """
+        from huggingface_hub import snapshot_download
+        
+        print(f"📥 Downloading {repo_id} to {local_dir}...")
+        
+        download_kwargs = {
+            "repo_id": repo_id,
+            "local_dir": local_dir,
+            "token": HF_TOKEN,
+            "resume_download": True,
+        }
+        
+        if patterns:
+            download_kwargs["allow_patterns"] = patterns
+        
+        try:
+            snapshot_download(**download_kwargs)
+            print(f"✅ Successfully downloaded {repo_id}")
+        except Exception as e:
+            print(f"❌ Error downloading {repo_id}: {e}")
 
     @modal.web_server(WEB_SERVER_PORT, startup_timeout=60)
     def ui(self):
