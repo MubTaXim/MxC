@@ -8,7 +8,7 @@ Download ALL models for FLUX.2 Klein 9B to Modal volume
 
 Downloads:
   - flux-2-klein-9b.safetensors (~18GB) - Main diffusion model (requires HF license)
-  - qwen_3_4b.safetensors (~8GB) - Text encoder
+  - qwen_3_8b_fp8mixed.safetensors (~8GB) - Text encoder (FP8 mixed precision)
   - flux2-vae.safetensors (~335MB) - VAE
 
 Run: modal run download_flux_klein.py
@@ -29,9 +29,9 @@ MODELS = {
         "requires_auth": True,
         "size": "~18GB"
     },
-    # Qwen 3.4B Text Encoder (public)
-    "qwen_3_4b.safetensors": {
-        "url": "https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/text_encoders/qwen_3_4b.safetensors",
+    # Qwen 3.8B FP8 Mixed Text Encoder (public) - Recommended for FLUX.2 Klein
+    "qwen_3_8b_fp8mixed.safetensors": {
+        "url": "https://huggingface.co/Comfy-Org/vae-text-encorder-for-flux-klein-9b/resolve/main/split_files/text_encoders/qwen_3_8b_fp8mixed.safetensors",
         "dir": "text_encoders",
         "requires_auth": False,
         "size": "~8GB"
@@ -148,7 +148,7 @@ def download_all_models(hf_token: str):
     print()
     print("📂 Models saved to Modal volume:")
     print(f"   • {VOLUME_MOUNT}/diffusion_models/flux-2-klein-9b.safetensors")
-    print(f"   • {VOLUME_MOUNT}/text_encoders/qwen_3_4b.safetensors")
+    print(f"   • {VOLUME_MOUNT}/text_encoders/qwen_3_8b_fp8mixed.safetensors")
     print(f"   • {VOLUME_MOUNT}/vae/flux2-vae.safetensors")
     print("=" * 70)
     

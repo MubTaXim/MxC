@@ -58,7 +58,7 @@ modal run download_flux_klein.py
 | Model | Size | Description |
 |-------|------|-------------|
 | `flux-2-klein-9b.safetensors` | ~18GB | Main diffusion model (best quality) |
-| `qwen_3_4b.safetensors` | ~8GB | Text encoder |
+| `qwen_3_8b_fp8mixed.safetensors` | ~8GB | Text encoder (FP8 mixed) |
 | `flux2-vae.safetensors` | ~335MB | VAE |
 
 > **Important:** You must accept the [FLUX.2-klein-9B license](https://huggingface.co/black-forest-labs/FLUX.2-klein-9B) on Hugging Face before downloading.

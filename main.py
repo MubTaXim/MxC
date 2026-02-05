@@ -137,29 +137,34 @@ if CPU is not None:
 if MEMORY is not None:
     container_kwargs["memory"] = MEMORY
 
+# User data directory on writable volume (used by --user-directory flag)
+USER_DATA_DIR = str(Path(VOLUME_MOUNT_LOCATION) / "user_data")
+
 # Use dictionary unpacking (**) to pass the arguments
 @app.cls(**container_kwargs)
 @modal.concurrent(max_inputs=MAX_INPUTS)
-
 class ComfyUIContainer:
     @modal.enter()
     def setup_dependencies(self):
         """
         Sets up writable user data directory on volume and installs custom node dependencies.
+        Uses ComfyUI's --user-directory flag instead of symlinks for reliability.
         """
         import shutil
         
-        # === Setup writable user/default directory on volume ===
-        # ComfyUI stores workflows, settings, and cache in user/default
-        # Modal's filesystem is read-only, so we symlink the entire directory to the volume
+        # === Setup writable user data directory on volume ===
+        # ComfyUI will be launched with --user-directory pointing here
+        # This avoids symlink issues with Modal's read-only filesystem
         
-        user_data_volume = Path(VOLUME_MOUNT_LOCATION) / "user_data"
-        workflows_volume = user_data_volume / "workflows"
-        comfy_user_default = Path(COMFYUI_DIR) / "user/default"
+        user_data_volume = Path(USER_DATA_DIR)
+        # ComfyUI expects user data in a 'default' subfolder
+        user_default = user_data_volume / "default"
+        workflows_volume = user_default / "workflows"
         workflows_template = Path("/tmp/workflows_template")
         
         # Create user_data directory structure on volume
         user_data_volume.mkdir(parents=True, exist_ok=True)
+        user_default.mkdir(parents=True, exist_ok=True)
         workflows_volume.mkdir(parents=True, exist_ok=True)
         
         # Copy template workflows to volume (only if they don't already exist)
@@ -173,19 +178,12 @@ class ComfyUIContainer:
         
         # Copy template comfy.settings.json if it doesn't exist on volume
         settings_template = Path("/root/comfy/ComfyUI/user/default/comfy.settings.json")
-        settings_dest = user_data_volume / "comfy.settings.json"
+        settings_dest = user_default / "comfy.settings.json"
         if settings_template.exists() and not settings_dest.exists():
             shutil.copy2(settings_template, settings_dest)
             print(f"  Copied: comfy.settings.json")
         
-        # Symlink ComfyUI's user/default to the writable volume location
-        comfy_user_default.parent.mkdir(parents=True, exist_ok=True)
-        if comfy_user_default.exists() and comfy_user_default.is_symlink():
-            comfy_user_default.unlink()
-        elif comfy_user_default.exists():
-            shutil.rmtree(comfy_user_default)
-        comfy_user_default.symlink_to(user_data_volume)
-        print(f"✅ User data directory linked: {comfy_user_default} -> {user_data_volume}")
+        print(f"✅ User data directory ready: {user_data_volume}")
         
         # Install custom node dependencies
         nodes_path = Path(CUSTOM_NODES_DIR)
@@ -242,6 +240,6 @@ class ComfyUIContainer:
         """
         print(f"Starting ComfyUI on  {WEB_SERVER_HOST}:{WEB_SERVER_PORT}...")
         subprocess.Popen(
-            f"comfy launch -- --output-directory {CUSTOM_OUTPUT_DIR} --listen {WEB_SERVER_HOST} --port {WEB_SERVER_PORT}",
+            f"comfy launch -- --output-directory {CUSTOM_OUTPUT_DIR} --user-directory {USER_DATA_DIR} --listen {WEB_SERVER_HOST} --port {WEB_SERVER_PORT}",
             shell=True
         )
