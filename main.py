@@ -145,36 +145,47 @@ class ComfyUIContainer:
     @modal.enter()
     def setup_dependencies(self):
         """
-        Scans the persistent custom_nodes directory for requirements.txt files
-        and installs the dependencies. Also sets up writable workflows directory.
+        Sets up writable user data directory on volume and installs custom node dependencies.
         """
         import shutil
         
-        # Setup writable workflows directory in volume
-        workflows_template = Path("/tmp/workflows_template")
-        workflows_dst = Path(VOLUME_MOUNT_LOCATION) / "workflows"
-        comfy_workflows_link = Path(COMFYUI_DIR) / "user/default/workflows"
+        # === Setup writable user/default directory on volume ===
+        # ComfyUI stores workflows, settings, and cache in user/default
+        # Modal's filesystem is read-only, so we symlink the entire directory to the volume
         
-        # Create workflows directory in volume if it doesn't exist
-        workflows_dst.mkdir(parents=True, exist_ok=True)
+        user_data_volume = Path(VOLUME_MOUNT_LOCATION) / "user_data"
+        workflows_volume = user_data_volume / "workflows"
+        comfy_user_default = Path(COMFYUI_DIR) / "user/default"
+        workflows_template = Path("/tmp/workflows_template")
+        
+        # Create user_data directory structure on volume
+        user_data_volume.mkdir(parents=True, exist_ok=True)
+        workflows_volume.mkdir(parents=True, exist_ok=True)
         
         # Copy template workflows to volume (only if they don't already exist)
         if workflows_template.exists():
             print(f"--- Syncing template workflows to volume ---")
             for workflow_file in workflows_template.glob("*.json"):
-                dest_file = workflows_dst / workflow_file.name
+                dest_file = workflows_volume / workflow_file.name
                 if not dest_file.exists():
                     shutil.copy2(workflow_file, dest_file)
                     print(f"  Copied: {workflow_file.name}")
         
-        # Create symlink from ComfyUI to volume workflows (writable location)
-        comfy_workflows_link.parent.mkdir(parents=True, exist_ok=True)
-        if comfy_workflows_link.exists() and comfy_workflows_link.is_symlink():
-            comfy_workflows_link.unlink()
-        elif comfy_workflows_link.exists():
-            shutil.rmtree(comfy_workflows_link)
-        comfy_workflows_link.symlink_to(workflows_dst)
-        print(f"✅ Workflows directory linked: {comfy_workflows_link} -> {workflows_dst}")
+        # Copy template comfy.settings.json if it doesn't exist on volume
+        settings_template = Path("/root/comfy/ComfyUI/user/default/comfy.settings.json")
+        settings_dest = user_data_volume / "comfy.settings.json"
+        if settings_template.exists() and not settings_dest.exists():
+            shutil.copy2(settings_template, settings_dest)
+            print(f"  Copied: comfy.settings.json")
+        
+        # Symlink ComfyUI's user/default to the writable volume location
+        comfy_user_default.parent.mkdir(parents=True, exist_ok=True)
+        if comfy_user_default.exists() and comfy_user_default.is_symlink():
+            comfy_user_default.unlink()
+        elif comfy_user_default.exists():
+            shutil.rmtree(comfy_user_default)
+        comfy_user_default.symlink_to(user_data_volume)
+        print(f"✅ User data directory linked: {comfy_user_default} -> {user_data_volume}")
         
         # Install custom node dependencies
         nodes_path = Path(CUSTOM_NODES_DIR)
