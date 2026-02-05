@@ -46,15 +46,22 @@ CIVITAI_API_TOKEN=your_civitai_token_here  # Optional
 python setup_modal.py
 ```
 
-### 4. Download FLUX.2 Klein Model
+### 4. Download FLUX.2 Klein 9B Models (One Command!)
 
-The FLUX.2-klein-9B model (~18GB) must be downloaded to your Modal volume:
+This downloads **everything needed** to run FLUX.2 Klein 9B (~27GB total):
 
 ```bash
 modal run download_flux_klein.py
 ```
 
-> **Note:** You must accept the [FLUX.2-klein-9B license](https://huggingface.co/black-forest-labs/FLUX.2-klein-9B) on Hugging Face before downloading.
+**What gets downloaded:**
+| Model | Size | Description |
+|-------|------|-------------|
+| `flux-2-klein-9b.safetensors` | ~18GB | Main diffusion model (best quality) |
+| `qwen_3_4b.safetensors` | ~8GB | Text encoder |
+| `flux2-vae.safetensors` | ~335MB | VAE |
+
+> **Important:** You must accept the [FLUX.2-klein-9B license](https://huggingface.co/black-forest-labs/FLUX.2-klein-9B) on Hugging Face before downloading.
 
 ### 5. Launch ComfyUI
 
@@ -67,6 +74,7 @@ modal deploy main.py
 ```
 
 Open the URL provided in the terminal to access ComfyUI.
+Load a workflow from `workflows/` folder and start generating!
 
 ---
 
